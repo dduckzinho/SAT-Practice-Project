@@ -1,9 +1,9 @@
 import customtkinter as ctk
-from config import TOPICS, SUB_TOPICS, SUB_TOPIC_TIME, DIFFICULTY
+from config import TOPICS, SUB_TOPICS, SUB_TOPIC_TIME, DIFFICULTY, MATH_SUB_TOPICS
 from gui.timer import Timer
 
 
-def startGUI():
+def startGUI(startSessionCallback):
     
     ctk.set_default_color_theme("SAT Question Log Project/gui/theme.json")
 
@@ -22,12 +22,12 @@ def startGUI():
     cqTab = ctk.CTkTabview(outerTab.tab("Custom Practice"))
     cqTab.pack(fill="both", expand=True, padx=10, pady=10)
 
-    customQuestionMode(cqTab)
+    customQuestionMode(cqTab, startSessionCallback)
     fullTestMode(outerTab.tab("Full Test"))
 
     root.mainloop()
 
-def customQuestionMode(tabview):
+def customQuestionMode(tabview, startSessionCallback):
     
     fTabMaster=tabview.add("Filters")
     sTabMaster=tabview.add("Settings")
@@ -212,21 +212,10 @@ def customQuestionMode(tabview):
                  font=("Helvetica", 16, "bold")
                 ).pack(side="top", anchor="ne", padx=10, pady=(10,5))
     
-    def updateTime():
-        seconds=calculateTime()*1.05+(timeSlider.get()*60)
-        timeLabel.configure(text=f"Time: {seconds//60:.0f} minutes and {seconds%60:.0f} seconds.")
-
-    def calculateTime():
-        totalSeconds=0
-        for subtopic, isSelected in boolSubTopics.items():
-            if isSelected.get():
-                qAmount=qAmtSliders[subtopic].get()
-                totalSeconds+=(SUB_TOPIC_TIME[subtopic]*qAmount)
-        print(totalSeconds//60, totalSeconds%60)
-        return totalSeconds
+    
 
     timeLabel=ctk.CTkLabel(timerFrame,
-                     text=f"Time: {calculateTime()}",
+                     text=f"Time: {0}",
                      font=("Helvetica", 14)
                     )
     timeLabel.pack(side="top", anchor="nw", padx=10, pady=(10,5))
@@ -247,6 +236,21 @@ def customQuestionMode(tabview):
     timeSlider.pack(side="left", padx=10)
     addTimeLabel.pack(side="left", padx=10)
 
+
+    def updateTime():
+            seconds=calculateTime()
+            timeLabel.configure(text=f"Time: {seconds//60:.0f} minutes and {seconds%60:.0f} seconds.")
+    
+    def calculateTime():
+        seconds=0
+        for subtopic, isSelected in boolSubTopics.items():
+            if isSelected.get():
+                qAmount=qAmtSliders[subtopic].get()
+                seconds+=(SUB_TOPIC_TIME[subtopic]*qAmount)
+        totalSeconds=seconds*1.05+(timeSlider.get()*60)
+        return totalSeconds
+
+    
     boolDifficulties={}
     for difficulty in DIFFICULTY:
         difficultySelected=ctk.BooleanVar(value=True)
@@ -258,9 +262,40 @@ def customQuestionMode(tabview):
         ).pack(padx=20, pady=5)
         boolDifficulties[difficulty]=difficultySelected
 
+    def getSettings():
+        subjects=[]
+        questionCount={}
+        difficulties=[]
+        timer=int(calculateTime())
+
+        for subtopic, isSelected in boolSubTopics.items():
+            if isSelected.get():
+                if any(subtopic in listSub for listSub in MATH_SUB_TOPICS.values()):
+                    if "Math" not in subjects:
+                        subjects.append("Math")
+                else:
+                    if "Math" not in subjects:
+                        subjects.append("English")
+
+                questionCount[subtopic]=int(qAmtSliders[subtopic].get())
+
+        for difficulty in DIFFICULTY:
+            if boolDifficulties[difficulty].get():
+                difficulties.append(DIFFICULTY[difficulty])
+
+        settings={
+            "subjects":subjects,
+            "questionCount":questionCount,
+            "difficulties":difficulties,
+            "timer":timer
+        }
+        return settings
+
+
     begin=ctk.CTkButton(
         cqModeSettings,
-        text="Begin Session"
+        text="Begin Session",
+        command=lambda: startSessionCallback(getSettings())
     )
     begin.pack(side="bottom", anchor="se", expand=True, pady=20, padx=20)
 

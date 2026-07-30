@@ -16,7 +16,7 @@ TOPICS={
             "Expression of Ideas"
         ]
     }
-SUB_TOPICS={
+MATH_SUB_TOPICS={
     "Algebra": [
         "Linear equations in one variable",
         "Linear functions",
@@ -46,8 +46,9 @@ SUB_TOPICS={
         "Lines, angles, and triangles",
         "Right triangles and trigonometry",
         "Circles"
-    ],
-
+    ]
+}
+ENG_SUB_TOPICS={
     "Information and Ideas": [
         "Central Ideas and Details",
         "Inferences",
@@ -70,6 +71,7 @@ SUB_TOPICS={
         "Form, Structure, and Sense"
     ]
 }
+SUB_TOPICS=MATH_SUB_TOPICS|ENG_SUB_TOPICS
 
 SUB_TOPIC_TIME = {
     "Linear equations in one variable": 60,

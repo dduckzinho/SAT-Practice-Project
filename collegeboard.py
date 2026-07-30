@@ -37,7 +37,7 @@ def downloadMetadata():
     if not os.path.exists("data/engQuestionsMetadata.csv"):
         engQuestions=getQuestionMetadata("INI,CAS,EOI,SEC", 1)
         with open("data/engQuestionsMetadata.csv", "a", newline="") as file:
-            writer=csv.DictWriter(file, fieldnames=["questionId", "externalId", "topic", "subTopic", "difficulty"])
+            writer=csv.DictWriter(file, fieldnames=["questionId", "externalId", "topic", "subtopic", "difficulty"])
             writer.writeheader()
             for question in engQuestions:
                 writer.writerow(getImportantData(question))
@@ -45,7 +45,7 @@ def downloadMetadata():
     if not os.path.exists("data/mathQuestionsMetadata.csv"):
         mathQuestions=getQuestionMetadata("H,P,Q,S", 2)
         with open("data/mathQuestionsMetadata.csv", "a", newline="") as file:
-            writer=csv.DictWriter(file, fieldnames=["questionId", "externalId", "topic", "subTopic", "difficulty"])
+            writer=csv.DictWriter(file, fieldnames=["questionId", "externalId", "topic", "subtopic", "difficulty"])
             writer.writeheader()
             for question in mathQuestions:
                 writer.writerow(getImportantData(question))
@@ -64,6 +64,6 @@ def getImportantData(question):
     return ({"questionId":questionId,
              "externalId":externalId,
              "topic":topic,
-             "subTopic":subTopic,
+             "subtopic":subTopic,
              "difficulty":difficulty})
 

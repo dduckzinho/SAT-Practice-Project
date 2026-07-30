@@ -9,19 +9,50 @@ class Question:
         stem,
         rationale,
         correctAnswer,
-        answerOptions=None,
-        image=None
+        answerOptions
     ):
-        self.question_type=questionType # "mcq" and "spr"
+        self.questionType=questionType #mcq or spr
         self.subject=subject
         self.topic=topic
         self.subtopic=subtopic
         self.difficulty=difficulty
 
         self.stem=stem
-        self.answer_options=answerOptions
+        self.answerOptions=answerOptions
 
-        self.correct_answer=correctAnswer
+        self.correctAnswer=correctAnswer
         self.rationale=rationale
 
-        self.image=image
+    def isCorrect(self, userAnswer):
+        return str(userAnswer).strip()==str(self.correctAnswer)
+
+    def getChoices(self):
+        return self.answerOptions
+
+    def isMultipleChoice(self):
+        return self.questionType=="mcq"
+
+    def isStudentResponse(self):
+        return self.questionType=="spr"
+
+    def __str__(self):
+        return f"""
+            Question type: {self.questionType}
+            Subject: {self.subject}
+            Topic: {self.topic}
+            Subtopic: {self.subtopic}
+            Difficulty: {self.difficulty}
+
+            Question:
+            {self.stem}
+
+            Rationale:
+            {self.rationale}
+
+            Correct answer: {self.correctAnswer}
+
+            Answer options:
+            {self.answerOptions}
+            """
+
+    
