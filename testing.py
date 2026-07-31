@@ -7,9 +7,9 @@ import re
 
 BASE_DIR = Path(__file__).parent
 metadata = BASE_DIR / "data" / "mathQuestionsMetadata.csv"
+print(metadata)
 
-
-with metadata.open("r") as file:
+with open("SAT Question Log Project/data/mathQuestionsMetadata.csv","r") as file:
         reader=csv.DictReader(file)
         rows = list(reader)
 
@@ -33,21 +33,6 @@ for row in rows:
     }
 
     try:
-        extID=question["externalid"]
-        
-    except KeyError: #small id question
-        questionType=typeDict[question["answer"]["style"]]
-        stem=question["prompt"]
-        rationale=question["answer"]["rationale"]
-
-        if questionType=="mcq":
-            correctAnswer=question["answer"]["correct_choice"]
-            answerOptions=question["answer"]["choices"]
-        else:
-            match=re.search(r"^<p>The correct answer is (.+).$", question["answer"]["rationale"])
-            correctAnswer=match.group(1)
-
-    else:
         questionType=question["type"]
         stem=question["stem"]
         rationale=question["rationale"]
@@ -56,6 +41,24 @@ for row in rows:
             answerOptions=question["answerOptions"]
         except KeyError:
             answerOptions=None
+        
+    except KeyError: #small id question
+        questionType=typeDict[question["answer"]["style"]]
+        stem=question["prompt"]
+        rationale=question["answer"]["rationale"]
+
+        if questionType=="mcq":
+            try:
+                correctAnswer=question["answer"]["correct_choice"]
+            except KeyError:
+                correctAnswer=None
+            answerOptions=question["answer"]["choices"]
+        else:
+            match=re.search(r"^<p>The correct answer is (.+?)\.", question["answer"]["rationale"])
+            try:
+                correctAnswer=match.group(1)
+            except AttributeError:
+                correctAnswer=rationale
 
 
     subject=None
@@ -63,10 +66,6 @@ for row in rows:
     subtopic=None
     difficulty=None
 
-    
-
-
-    question=(getQuestion(row["externalId"]))
 
     qObject=q.Question(
         questionType,

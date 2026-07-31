@@ -29,28 +29,48 @@ def getQuestion(externalID):
     ).json()
 
     return question
+def getQuestion(extID):
+
+    try:
+        response = requests.get(QUESTION_URL)
+        
+        if response.status_code != 200: # it sent me an empty response once...
+            print(f"Failed to get: {extID}. Status code: {response.status_code}")
+            return None
+
+        if not response.text.strip():
+            print(f"Empty response: {extID}")
+            return None
+        
+        return response.json()
+
+    except requests.exceptions.JSONDecodeError:
+        print(f"non-json text for ID: {extID}. {response.text[:100]}")
+        return None
+    except Exception as e:
+        print(f"Error for ID {extID}: {e}")
+        return None
+
+
 
 def downloadMetadata():
 
-    print("Downloading Questions Meta Data...")
-
-    if not os.path.exists("data/engQuestionsMetadata.csv"):
+    if not os.path.exists("SAT Question Log Project/data/engQuestionsMetadata.csv"):
         engQuestions=getQuestionMetadata("INI,CAS,EOI,SEC", 1)
-        with open("data/engQuestionsMetadata.csv", "a", newline="") as file:
+        with open("SAT Question Log Project/data/engQuestionsMetadata.csv", "a", newline="") as file:
             writer=csv.DictWriter(file, fieldnames=["questionId", "externalId", "topic", "subtopic", "difficulty"])
             writer.writeheader()
             for question in engQuestions:
                 writer.writerow(getImportantData(question))
 
-    if not os.path.exists("data/mathQuestionsMetadata.csv"):
+    if not os.path.exists("SAT Question Log Project/data/mathQuestionsMetadata.csv"):
         mathQuestions=getQuestionMetadata("H,P,Q,S", 2)
-        with open("data/mathQuestionsMetadata.csv", "a", newline="") as file:
+        with open("SAT Question Log Project/data/mathQuestionsMetadata.csv", "a", newline="") as file:
             writer=csv.DictWriter(file, fieldnames=["questionId", "externalId", "topic", "subtopic", "difficulty"])
             writer.writeheader()
             for question in mathQuestions:
                 writer.writerow(getImportantData(question))
 
-    print("Finished downloading.")
 
 def getImportantData(question):
     questionId=question["questionId"]
