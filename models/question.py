@@ -1,7 +1,7 @@
 class Question:
     def __init__(
         self,
-        questionType,
+        type,
         subject,
         topic,
         subtopic,
@@ -9,36 +9,38 @@ class Question:
         stem,
         rationale,
         correctAnswer,
-        answerOptions
+        options,
+        resource
     ):
-        self.questionType=questionType #mcq or spr
+        self.type=type #mcq or spr
         self.subject=subject
         self.topic=topic
         self.subtopic=subtopic
         self.difficulty=difficulty
 
         self.stem=stem
-        self.answerOptions=answerOptions
+        self.options=options
 
         self.correctAnswer=correctAnswer
         self.rationale=rationale
+        self.resource=resource
 
     def isCorrect(self, userAnswer):
         return str(userAnswer).strip()==str(self.correctAnswer)
 
     def getChoices(self):
-        return self.answerOptions
+        return self.options
 
     def isMultipleChoice(self):
-        return self.questionType=="mcq"
+        return self.type=="mcq"
 
     def isStudentResponse(self):
-        return self.questionType=="spr"
+        return self.type=="spr"
 
 
     def __str__(self):
         return f"""
-            Question type: {self.questionType}
+            Question type: {self.type}
             Subject: {self.subject}
             Topic: {self.topic}
             Subtopic: {self.subtopic}
@@ -47,7 +49,7 @@ class Question:
             Question length: {len(self.stem)}
             Rationale: {shorten(self.rationale)}
             Correct answer: {self.correctAnswer}
-            Answer options: {(self.answerOptions)}
+            Answer options: {(self.options)}
             """
 
 def shorten(text):
@@ -56,10 +58,10 @@ def shorten(text):
     
     if isinstance(text, str):
         
-        if len(text)<=40:
+        if len(text)<=100:
             return text
         
-        return text[:40]+"..."
+        return text[:100]+"..."
     
     if isinstance(text, list) or isinstance(text, dict):
         return f"Dictionary or list of length {len(text)}"

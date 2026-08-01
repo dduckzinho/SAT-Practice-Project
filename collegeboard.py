@@ -3,7 +3,7 @@ import requests
 import csv
 import os
 
-headers = {
+headers={
     "Content-Type": "application/json",
     "Origin": "https://satsuiteeducatorquestionbank.collegeboard.org",
     "Referer": "https://satsuiteeducatorquestionbank.collegeboard.org/"
@@ -17,39 +17,24 @@ def getQuestionMetadata(domains, test):
         "test":test
     }
 
-    questions = requests.post(QUESTIONS_URL, json=payload, headers=headers).json()
+    questions=requests.post(QUESTIONS_URL, json=payload, headers=headers).json()
 
     return questions
 
 def getQuestion(externalID):
 
-    question = requests.post(
+    question=requests.post(
         QUESTION_URL,
-        json={"external_id": externalID}
-    ).json()
-
-    return question
-def getQuestion(extID):
-
-    try:
-        response = requests.get(QUESTION_URL)
-        
-        if response.status_code != 200: # it sent me an empty response once...
-            print(f"Failed to get: {extID}. Status code: {response.status_code}")
-            return None
-
-        if not response.text.strip():
-            print(f"Empty response: {extID}")
-            return None
-        
-        return response.json()
-
-    except requests.exceptions.JSONDecodeError:
-        print(f"non-json text for ID: {extID}. {response.text[:100]}")
-        return None
-    except Exception as e:
-        print(f"Error for ID {extID}: {e}")
-        return None
+        json={
+            "external_id": externalID
+        },
+        headers={
+            "Content-Type": "application/json",
+            "Origin": "https://satsuiteeducatorquestionbank.collegeboard.org",
+            "Referer": "https://satsuiteeducatorquestionbank.collegeboard.org/",
+        }
+    )
+    return question.json()
 
 
 

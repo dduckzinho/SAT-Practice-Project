@@ -173,23 +173,15 @@ function updateTime(){
 async function beginSession() {
     let payload={
         questionCount: Object.fromEntries(
-            Array.from(selectedSubTopics).map(sub =>[sub, subTopicAmounts[sub] || 10])
+            Array.from(selectedSubTopics).map(sub => [sub, subTopicAmounts[sub] || 10])
         ),
-        difficulties:Array.from(selectedDifficulties),
-        extraTime:extraTime
+        difficulties: Array.from(selectedDifficulties),
+        extraTime: extraTime
     };
+    
+    let targetUrl=await pywebview.api.submitSettings(payload);
 
-    await pywebview.api.submitSettings(payload);
-    document.getElementById('custom-practice').style.display='none';
-    document.getElementById('session-container').style.display='block';
-
-    const timerSeconds=await pywebview.api.getSessionTimer();
-    startCountdown(timerSeconds, () => {
-        alert("Time has ended.");
-        // auto submit code todo
-    });
-
-    loadAndRenderCurrentQuestion();
+    window.location.href='../qv_window.html';
 }
 
 

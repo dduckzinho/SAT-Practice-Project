@@ -8,17 +8,14 @@ class Session:
 
     def curQuestion(self):
         currentQuestion = self.questions[self.currentIndex]
-        
         return {
-            "type": "mcq",  # Must match what JS expects ("mcq" or "spr")
-            "stem": currentQuestion.stem,  # The HTML text of the question
-            "options": [
-                {"id": "A", "content": currentQuestion.option_a},
-                {"id": "B", "content": currentQuestion.option_b},
-                {"id": "C", "content": currentQuestion.option_c},
-                {"id": "D", "content": currentQuestion.option_d}
-            ]
+            "type": currentQuestion.type,
+            "stem": currentQuestion.stem,
+            "options": currentQuestion.options,
+            "rationale": currentQuestion.rationale,
+            "correctAnswer": currentQuestion.correctAnswer
         }
+
 
     def nextQuestion(self):
         if self.currentIndex< len(self.questions)-1:

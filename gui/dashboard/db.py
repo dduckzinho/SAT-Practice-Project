@@ -1,7 +1,7 @@
 import webview
 import os
 from config import TOPICS, SUB_TOPICS, SUB_TOPIC_TIME, DIFFICULTY, MATH_SUB_TOPICS
-from models.session import Session
+import pathlib
 
 class DashboardAPI:
     def __init__(self, callback):
@@ -17,6 +17,7 @@ class DashboardAPI:
         }
 
     def submitSettings(self, payload):
+
         subjects=[]
         questionCount=payload["questionCount"]
         difficulties=[]
@@ -44,7 +45,9 @@ class DashboardAPI:
             "difficulties": difficulties,
             "timer": timer
         }
-        self.session=self.callback(settings) # this returns the session object created in main.py
+        self.session=self.callback(settings) 
+
+        return True
     
     def getCurrentQuestion(self):
         if self.session:
@@ -76,12 +79,25 @@ class DashboardAPI:
         if self.session:
             return self.session.timer
         return 0
+        
+    def getCurrentQuestion(self):
+        if self.session:
+            data=self.session.curQuestion()
+            print("--- DEBUG CURQUESTION SENT TO JS ---")
+            print(data)
+            print("------------------------------------")
+            return data
+        return None
+
+    def debug(self, object):
+        print(object)
 
 def startGUI(startSessionCallback):
     api=DashboardAPI(startSessionCallback)
-
+    
     curDir=os.path.dirname(os.path.abspath(__file__))
-    htmlFilePath=os.path.join(curDir, 'db_html.html')
+    gui_dir=os.path.dirname(curDir)
+    htmlFilePath=os.path.join(gui_dir, 'db_window.html')
 
     webview.create_window(
         title="SAT Practice Dashboard", 

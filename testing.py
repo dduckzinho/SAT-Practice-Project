@@ -6,10 +6,10 @@ import models.question as q
 import re
 
 BASE_DIR = Path(__file__).parent
-metadata = BASE_DIR / "data" / "mathQuestionsMetadata.csv"
+metadata = BASE_DIR / "data" / "engQuestionsMetadata.csv"
 print(metadata)
 
-with open("SAT Question Log Project/data/mathQuestionsMetadata.csv","r") as file:
+with open("SAT Question Log Project/data/engQuestionsMetadata.csv","r") as file:
         reader=csv.DictReader(file)
         rows = list(reader)
 
@@ -19,12 +19,11 @@ i=0
 questions=[]
 for row in rows:
     i+=1
-    if i>=20:
+    if i>=3:
         break
-
+    
     question=getQuestion(row["externalId"])
-
-
+    print(question)
     #---------------------
 
     typeDict={
@@ -59,6 +58,7 @@ for row in rows:
                 correctAnswer=match.group(1)
             except AttributeError:
                 correctAnswer=rationale
+            answerOptions=[]
 
 
     subject=None
@@ -80,7 +80,7 @@ for row in rows:
     )
     questions.append(qObject)
     
-for question in questions:
-    print(question)
+"""for question in questions:
+    print(question)"""
 
     

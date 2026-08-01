@@ -1,2 +1,0 @@
-# SAT Practice Project
-

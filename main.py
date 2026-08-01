@@ -23,7 +23,7 @@ def startSession(settings):
 
     questions=[]
     for id in IDs:
-        questions.append(makeQuestion(getQuestion(id), IDs[id]["subtopic"], IDs[id]["difficulty"]))
+        questions.append(makeQuestion(id, IDs[id]["subtopic"], IDs[id]["difficulty"]))
 
     session=Session(questions, settings["timer"])
     return session
