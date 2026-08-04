@@ -49,7 +49,8 @@ class Question:
             Question length: {len(self.stem)}
             Rationale: {shorten(self.rationale)}
             Correct answer: {self.correctAnswer}
-            Answer options: {(self.options)}
+            Answer options: {shorten(self.options)}
+            Resource: {shorten(self.resource)}
             """
 
 def shorten(text):

@@ -17,8 +17,39 @@ async function loadAndRenderCurrentQuestion(){
         return;
     }
 
-
     document.getElementById('question-stem-container').innerHTML=question.stem || "No stem provided.";
+
+    const stimulusContainer=document.getElementById("stimulus-container");
+
+    const stimulusPanel=document.getElementById("stimulus-panel");
+    const questionPanel=document.getElementById("question-panel");
+    
+    if (question.resource){
+
+        stimulusPanel.classList.remove("d-none");
+
+        questionPanel.classList.remove("col-12");
+        questionPanel.classList.add("col-md-6");
+
+        if (question.resource.startsWith("data:image/")){
+            stimulusContainer.innerHTML=`<img src="${question.resource}" class="img-fluid">`;
+
+        }else if (question.resource.trim().startsWith("<svg")){
+            stimulusContainer.innerHTML=question.resource;
+
+        }else{
+            stimulusContainer.innerHTML=question.resource;
+        }
+    }else{
+        stimulusContainer.innerHTML="";
+
+        stimulusPanel.classList.add("d-none");
+
+        questionPanel.classList.remove("col-md-6");
+        questionPanel.classList.add("col-12");
+
+    }
+    
 
     const optionsContainer=document.getElementById('answer-options-container');
     optionsContainer.innerHTML='';
@@ -26,6 +57,8 @@ async function loadAndRenderCurrentQuestion(){
     const qType=(question.type || "").toLowerCase();
 
     await pywebview.api.debug(question.options);
+    await pywebview.api.debug(question.resource);
+    await pywebview.api.debug("abc1234444");
 
     if (qType==="mcq"){
 
@@ -35,7 +68,7 @@ async function loadAndRenderCurrentQuestion(){
 
                 question.options.forEach((opt, index) => {
                     optionsContainer.innerHTML += `
-                        <div class="form-check mb-2 p-2 border border-secondary rounded">
+                        <div class="form-check mb-2 p-2 rounded">
                             <input
                                 class="form-check-input"
                                 type="radio"
@@ -55,7 +88,7 @@ async function loadAndRenderCurrentQuestion(){
 
                 Object.entries(question.options).forEach(([letter, opt], index) => {
                     optionsContainer.innerHTML += `
-                        <div class="form-check mb-2 p-2 border border-secondary rounded">
+                        <div class="form-check mb-2 p-2 rounded">
                             <input
                                 class="form-check-input"
                                 type="radio"
@@ -79,7 +112,7 @@ async function loadAndRenderCurrentQuestion(){
         optionsContainer.innerHTML=`
             <div class="mb-3">
                 <label for="spr-input" class="form-label text-light">Enter your response:</label>
-                <input type="text" id="spr-input" class="form-control bg-dark text-white border-secondary" placeholder="Type answer here..." oninput="saveAnswer(this.value)">
+                <input type="text" id="spr-input" class="form-control bg-dark text-white" placeholder="Type answer here..." oninput="saveAnswer(this.value)">
             </div>
         `;
     }else{

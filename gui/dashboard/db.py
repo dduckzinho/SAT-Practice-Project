@@ -1,7 +1,6 @@
 import webview
 import os
 from config import TOPICS, SUB_TOPICS, SUB_TOPIC_TIME, DIFFICULTY, MATH_SUB_TOPICS
-import pathlib
 
 class DashboardAPI:
     def __init__(self, callback):

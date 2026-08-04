@@ -85,7 +85,7 @@ function renderTopics(){
 function renderSubTopics(){
     let html='';
     selectedTopics.forEach(topic=>{
-        html += `<div class="topic-card"><h6 class="text-info">${topic}</h6><div class="ms-3 mt-2">`;
+        html += `<div class="topic-card"><h6 class="topic-title">${topic}</h6><div class="ms-3 mt-2">`;
         if (SUB_TOPICS[topic]) {
             SUB_TOPICS[topic].forEach(sub =>{
                 let cleanId=sub.replace(/\W/g, '');
@@ -125,7 +125,7 @@ function renderSubTopics(){
 function renderSliders(){
     let html='';
     if (selectedSubTopics.size===0) {
-        html='<p class="text-muted">Select subtopics in the Filters tab to see options here.</p>';
+        html='<p class="empty-message">Select subtopics in the Filters tab to see options here.</p>';
     } else {
         selectedSubTopics.forEach(sub=>{
             let val=subTopicAmounts[sub] || 10;

@@ -4,16 +4,15 @@ from gui.dashboard.db import startGUI
 import csv
 import models.question as q
 import random as r
-import copy
+from copy import deepcopy
 from models.session import Session
 from parser import makeQuestion
-from collegeboard import getQuestion
 
 
 def startSession(settings):
     
-    mathExtIDs = {}
-    engExtIDs = {}
+    mathExtIDs={}
+    engExtIDs={}
 
     if "Math" in settings["subjects"]:
         mathExtIDs=collectExternalIDs("SAT Question Log Project/data/mathQuestionsMetadata.csv", settings)
@@ -32,7 +31,7 @@ def startSession(settings):
 
         
 def collectExternalIDs(metaFile, settings):
-    remainingQuestionCount= copy.deepcopy(settings)
+    remainingQuestionCount=deepcopy(settings)
     extIDs={}
 
     with open(metaFile,"r", encoding="utf-8-sig") as file:

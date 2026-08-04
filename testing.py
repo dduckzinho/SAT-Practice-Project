@@ -4,14 +4,15 @@ import csv
 from pathlib import Path
 import models.question as q
 import re
+from bs4 import BeautifulSoup
 
-BASE_DIR = Path(__file__).parent
-metadata = BASE_DIR / "data" / "engQuestionsMetadata.csv"
-print(metadata)
+BASE_DIR=Path(__file__).parent
+metadata=BASE_DIR / "data" / "engQuestionsMetadata.csv"
+#print(metadata)
 
-with open("SAT Question Log Project/data/engQuestionsMetadata.csv","r") as file:
+with open("SAT Question Log Project/data/mathQuestionsMetadata.csv","r") as file:
         reader=csv.DictReader(file)
-        rows = list(reader)
+        rows=list(reader)
 
 r.shuffle(rows)
 
@@ -19,11 +20,13 @@ i=0
 questions=[]
 for row in rows:
     i+=1
-    if i>=3:
+    if i>=10:
         break
     
     question=getQuestion(row["externalId"])
-    print(question)
+    
+    print(question.keys())
+    # print(question)
     #---------------------
 
     typeDict={
@@ -66,6 +69,27 @@ for row in rows:
     subtopic=None
     difficulty=None
 
+    soup=BeautifulSoup(stem, "html.parser")
+
+    resource=None
+
+    if "stimulus" in question and question["stimulus"]:
+        resource=question["stimulus"]
+    else:
+        figure=soup.find("figure")
+
+        if figure:
+            svg=figure.find("svg")
+            img=figure.find("img")
+
+            if svg:
+                resource=str(svg)
+            elif img:
+                resource=img.get("src")
+
+            figure.decompose()
+
+    stem=str(soup)
 
     qObject=q.Question(
         questionType,
@@ -76,11 +100,12 @@ for row in rows:
         stem,
         rationale,
         correctAnswer,
-        answerOptions
+        answerOptions,
+        resource
     )
     questions.append(qObject)
     
-"""for question in questions:
-    print(question)"""
+for question in questions:
+    print(question)
 
     

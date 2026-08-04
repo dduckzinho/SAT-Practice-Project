@@ -7,13 +7,14 @@ class Session:
         self.answers={}
 
     def curQuestion(self):
-        currentQuestion = self.questions[self.currentIndex]
-        return {
-            "type": currentQuestion.type,
-            "stem": currentQuestion.stem,
-            "options": currentQuestion.options,
-            "rationale": currentQuestion.rationale,
-            "correctAnswer": currentQuestion.correctAnswer
+        currentQuestion=self.questions[self.currentIndex]
+        return{
+            "type":currentQuestion.type,
+            "stem":currentQuestion.stem,
+            "options":currentQuestion.options,
+            "rationale":currentQuestion.rationale,
+            "correctAnswer":currentQuestion.correctAnswer,
+            "resource":currentQuestion.resource
         }
 
 
