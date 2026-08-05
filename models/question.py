@@ -1,6 +1,7 @@
 class Question:
     def __init__(
         self,
+        id,
         type,
         subject,
         topic,
@@ -12,6 +13,7 @@ class Question:
         options,
         resource
     ):
+        self.id=id
         self.type=type #mcq or spr
         self.subject=subject
         self.topic=topic
@@ -40,6 +42,7 @@ class Question:
 
     def __str__(self):
         return f"""
+            External ID: {self.id}
             Question type: {self.type}
             Subject: {self.subject}
             Topic: {self.topic}

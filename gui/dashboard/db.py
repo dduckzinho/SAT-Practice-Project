@@ -81,7 +81,7 @@ class DashboardAPI:
         
     def getCurrentQuestion(self):
         if self.session:
-            data=self.session.curQuestion()
+            data=self.session.curQuestion() | {"is_first":self.session.inFirstQuestion(), "is_last":self.session.inLastQuestion()}
             print("--- DEBUG CURQUESTION SENT TO JS ---")
             print(data)
             print("------------------------------------")
@@ -90,6 +90,19 @@ class DashboardAPI:
 
     def debug(self, object):
         print(object)
+
+    def updateQuestionTime(self, ms):
+        self.session.updateQuestionTime(ms)
+
+    def finalizeSession(self):
+        score=self.session.finalizeSession()
+        
+
+        return {
+            "status":"success",
+            "score":score
+        }
+
 
 def startGUI(startSessionCallback):
     api=DashboardAPI(startSessionCallback)

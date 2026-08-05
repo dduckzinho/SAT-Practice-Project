@@ -54,4 +54,4 @@ def collectExternalIDs(metaFile, settings):
 
 if (__name__=="__main__"):
     downloadMetadata()
-    startGUI(startSession)
+    startGUI(startSession)  

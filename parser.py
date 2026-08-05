@@ -4,6 +4,9 @@ import models.question as q
 from config import SUB_TOPICS, TOPICS
 import sys
 from bs4 import BeautifulSoup
+from PIL import Image
+import base64
+import io
 
 exampleHTML="""
 <p class=\"stem_paragraph \">The equation <span class=\"math_expression \"><span class=\"math-container\"><img align=\"middle\" role=
@@ -20,6 +23,40 @@ h6HToDQbd51lHcyDdBnvS08EwRh3tLWDje1Y8d0AVO7IoezsYBlb5+CqTnod6gQ6+8P9tsY3a+JEOHMd
 CC\" alt=\"open parenthesis, x plus 6, close parenthesis, squared, plus, open parenthesis, y plus 3, close parenthesis, squared, equals
 121 \"></span></span> defines a circle in the <span class=\"italic \">xy</span>&#8209;plane. What is the radius of the circle?</p>\n
 """
+
+def crop_embedded_pngs(html):
+    soup=BeautifulSoup(html, "html.parser")
+
+    for img in soup.find_all("img"):
+        src=img.get("src", "")
+        if src.startswith("data:image/png;base64,"):
+            img["src"]=crop_transparent_png(src)
+
+    return str(soup)
+
+def crop_transparent_png(data_uri):
+    if not data_uri.startswith("data:image/png;base64,"):
+        return data_uri
+
+    prefix, b64=data_uri.split(",", 1)
+
+    try:
+        img=Image.open(io.BytesIO(base64.b64decode(b64))).convert("RGBA")
+    except Exception:
+        return data_uri
+    
+    alpha=img.split()[-1]
+    bbox=alpha.getbbox()
+    
+    if bbox is None:
+        return data_uri
+
+    img=img.crop(bbox)
+
+    output=io.BytesIO()
+    img.save(output, format="PNG")
+
+    return prefix + "," + base64.b64encode(output.getvalue()).decode()
 
 def makeQuestion(extID, subtopic, difficulty):
 
@@ -91,9 +128,30 @@ def makeQuestion(extID, subtopic, difficulty):
                 resource=img.get("src")
             figure.decompose()
 
+    for img in soup.find_all("img"):
+        src=img.get("src", "")
+        if src.startswith("data:image/png;base64,"):
+            img["src"]=crop_transparent_png(src)
+
     stem=str(soup)
 
+    if answerOptions:
+        if isinstance(answerOptions, list):
+            for option in answerOptions:
+                if "body" in option:
+                    option["body"]=crop_embedded_pngs(option["body"])
+                if "content" in option:
+                    option["content"]=crop_embedded_pngs(option["content"])
+
+        elif isinstance(answerOptions, dict):
+            for option in answerOptions.values():
+                if "body" in option:
+                    option["body"]=crop_embedded_pngs(option["body"])
+                if "content" in option:
+                    option["content"]=crop_embedded_pngs(option["content"])
+
     qObject=q.Question(
+        extID,
         questionType,
         subject,
         topic,

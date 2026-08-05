@@ -97,3 +97,12 @@ body{
     margin-left: auto;
     margin-right: auto;
 }
+
+#answer-options-container .form-check-input {
+    margin-left: -2rem;
+    
+}
+
+#answer-options-container .form-check-label {
+    padding: 0.4rem 0.6rem;
+}
