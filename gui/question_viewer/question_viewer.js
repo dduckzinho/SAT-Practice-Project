@@ -120,7 +120,7 @@ async function loadAndRenderCurrentQuestion(){
     const submitBtn=document.getElementById('submit-btn');
     const prevBtn=document.getElementById('prev-btn');
 
-    if (question.is_last){
+    if (question.isLast){
         nextBtn.classList.add('d-none');
         submitBtn.classList.remove('d-none');
     } else{
@@ -128,7 +128,7 @@ async function loadAndRenderCurrentQuestion(){
         submitBtn.classList.add('d-none');
     }
 
-    if (question.is_first){
+    if (question.isFirst){
         prevBtn.disabled=true;
     } else{
         prevBtn.disabled=false;
@@ -178,7 +178,7 @@ async function submitFinalTest(){
             await pywebview.api.debug("No result or result was unsucessful.");
         }
     } catch (error){
-        await pywebview.api.debug("Error "+error);
+        await pywebview.api.debug("Error: "+error);
     }
 }
 

@@ -39,6 +39,15 @@ class Question:
     def isStudentResponse(self):
         return self.type=="spr"
 
+    def getInfo(self):
+        return [
+            self.id,
+            self.subject,
+            self.topic,
+            self.subtopic,
+            self.difficulty,
+            self.correctAnswer
+        ]
 
     def __str__(self):
         return f"""

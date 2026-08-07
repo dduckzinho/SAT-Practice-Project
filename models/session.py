@@ -1,3 +1,5 @@
+import datetime
+
 class Session:
     def __init__(self, questions, timer):
         self.questions=questions
@@ -6,6 +8,7 @@ class Session:
         self.currentIndex=0
         self.answers={}
         self.timeSpent={}
+        self.date=datetime.now().strftime("%Y-%m-%d")
 
     def curQuestion(self):
         currentQuestion=self.questions[self.currentIndex]
@@ -21,7 +24,7 @@ class Session:
 
 
     def nextQuestion(self):
-        if self.currentIndex< len(self.questions)-1:
+        if self.currentIndex<len(self.questions)-1:
             self.currentIndex+=1
 
     def previousQuestion(self):

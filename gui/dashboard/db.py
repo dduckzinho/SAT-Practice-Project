@@ -1,6 +1,7 @@
 import webview
 import os
 from config import TOPICS, SUB_TOPICS, SUB_TOPIC_TIME, DIFFICULTY, MATH_SUB_TOPICS
+from answer_logger import logSession, scoreSession
 
 class DashboardAPI:
     def __init__(self, callback):
@@ -81,10 +82,10 @@ class DashboardAPI:
         
     def getCurrentQuestion(self):
         if self.session:
-            data=self.session.curQuestion() | {"is_first":self.session.inFirstQuestion(), "is_last":self.session.inLastQuestion()}
-            print("--- DEBUG CURQUESTION SENT TO JS ---")
+            data=self.session.curQuestion()|{"isFirst":self.session.inFirstQuestion(), "isLast":self.session.inLastQuestion()}
+            print("debug: sent to js")
             print(data)
-            print("------------------------------------")
+            print("^^^^^^^")
             return data
         return None
 
@@ -95,7 +96,8 @@ class DashboardAPI:
         self.session.updateQuestionTime(ms)
 
     def finalizeSession(self):
-        score=self.session.finalizeSession()
+        logSession(self.session)
+        score=scoreSession(self.session)
         
 
         return {
