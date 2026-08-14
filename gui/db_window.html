@@ -14,6 +14,10 @@
         <li class="nav-item" role="presentation">
             <button class="nav-link" data-bs-toggle="tab" data-bs-target="#full-test" type="button">Full Test</button>
         </li>
+        
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" href="stats_window.html">Statistics</a>
+        </li>
     </ul>
 
     <div class="tab-content" id="outerTabContent">
@@ -58,7 +62,7 @@
                     </div>
 
                     <div class="d-flex justify-content-end">
-                        <button class="btn btn-primary" onclick="beginSession()">Begin Session</button>
+                        <button class="btn btn-primary" onclick="beginCustomSession()">Begin Session</button>
                     </div>
                 </div>
             </div>
@@ -66,7 +70,65 @@
 
         <div class="tab-pane fade" id="full-test" role="tabpanel">
             <h3 class="mt-4">Full Test Mode</h3>
-            <p class="text-muted">Full test implementation will come later. (WIP)</p>
+            <div class="mb-5">
+                <h4 class="mb-3">Select Modules</h4>
+                <div class="form-check fs-5 mb-2">
+                    <input
+                        class="form-check-input full-test-subject-cb"
+                        type="checkbox"
+                        id="full-test-math"
+                        value="Math"
+                        checked
+                    />
+                    <label class="form-check-label" for="full-test-math"> Math </label>
+                </div>
+                <div class="form-check fs-5">
+                    <input
+                        class="form-check-input full-test-subject-cb"
+                        type="checkbox"
+                        id="full-test-english"
+                        value="English"
+                        checked
+                    />
+                    <label class="form-check-label" for="full-test-english"> English </label>
+                </div>
+            </div>
+            <div class="mb-5">
+                <h4 class="mb-3">Module Settings</h4>
+                <div class="form-check fs-5 mb-2">
+                    <input class="form-check-input full-test-skip-cb" type="checkbox" id="skip-module-math" value="Math" />
+                    <label class="form-check-label" for="skip-module-math"> Skip Module One: Math </label>
+                </div>
+                <div class="form-check fs-5">
+                    <input
+                        class="form-check-input full-test-skip-cb"
+                        type="checkbox"
+                        id="skip-module-english"
+                        value="English"
+                    />
+                    <label class="form-check-label" for="skip-module-english"> Skip Module One: English </label>
+                </div>
+            </div>
+            <div class="mb-5">
+                <h4>Timer Settings</h4>
+                <p id="full-test-timeDisplay" class="fs-5 fw-bold text-primary">Extra Time: 0 minutes</p>
+                <div class="d-flex align-items-center mt-3">
+                    <input
+                        type="range"
+                        class="form-range"
+                        id="full-test-extra-time-slider"
+                        min="0"
+                        max="50"
+                        step="1"
+                        value="0"
+                        style="flex: 1"
+                    />
+                    <span id="full-test-extra-time-val" class="ms-3 fw-bold" style="min-width: 120px"> No extra time </span>
+                </div>
+            </div>
+            <div class="d-flex justify-content-end">
+                <button class="btn btn-primary" onclick="beginFullTestSession()">Begin Full Test</button>
+            </div>
         </div>
     </div>
     <script src="dashboard/db_js.js"></script>

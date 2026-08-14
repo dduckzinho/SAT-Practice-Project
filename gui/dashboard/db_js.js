@@ -7,7 +7,7 @@ let subTopicAmounts={};
 let extraTime=0;
 let selectedDifficulties=new Set();
 
-window.addEventListener('pywebviewready', async function() {
+window.addEventListener('pywebviewready', async function(){
     const config=await pywebview.api.getConfig();
     
     TOPICS=config.TOPICS;
@@ -18,11 +18,12 @@ window.addEventListener('pywebviewready', async function() {
     selectedDifficulties=new Set(Object.keys(DIFFICULTY));
 
     renderUI();
+    initializeFullTest()
 });
 
 function renderUI(){
     let subjHTML='';
-    Object.keys(TOPICS).forEach(subj => {
+    Object.keys(TOPICS).forEach(subj=>{
         subjHTML += `<div class="form-check form-check-inline fs-5">
             <input class="form-check-input subj-cb" type="checkbox" id="subj-${subj}" value="${subj}">
             <label class="form-check-label" for="subj-${subj}">${subj}</label>
@@ -30,8 +31,8 @@ function renderUI(){
     });
     document.getElementById('subjects-container').innerHTML=subjHTML;
 
-    document.querySelectorAll('.subj-cb').forEach(cb => {
-        cb.addEventListener('change', (e) => {
+    document.querySelectorAll('.subj-cb').forEach(cb=>{
+        cb.addEventListener('change', (e)=>{
             if(e.target.checked) selectedSubjects.add(e.target.value);
             else selectedSubjects.delete(e.target.value);
             renderTopics();
@@ -39,7 +40,7 @@ function renderUI(){
     });
 
     let diffHTML='';
-    Object.keys(DIFFICULTY).forEach(diff => {
+    Object.keys(DIFFICULTY).forEach(diff=>{
         diffHTML += `<div class="form-check fs-5">
             <input class="form-check-input diff-cb" type="checkbox" id="diff-${diff}" value="${diff}" checked>
             <label class="form-check-label" for="diff-${diff}">${diff}</label>
@@ -73,7 +74,7 @@ function renderTopics(){
     selectedTopics.clear();
     renderSubTopics();
 
-    document.querySelectorAll('.topic-cb').forEach(cb =>{
+    document.querySelectorAll('.topic-cb').forEach(cb=>{
         cb.addEventListener('change', (e)=>{
             if(e.target.checked) selectedTopics.add(e.target.value);
             else selectedTopics.delete(e.target.value);
@@ -86,8 +87,8 @@ function renderSubTopics(){
     let html='';
     selectedTopics.forEach(topic=>{
         html += `<div class="topic-card"><h6 class="topic-title">${topic}</h6><div class="ms-3 mt-2">`;
-        if (SUB_TOPICS[topic]) {
-            SUB_TOPICS[topic].forEach(sub =>{
+        if (SUB_TOPICS[topic]){
+            SUB_TOPICS[topic].forEach(sub=>{
                 let cleanId=sub.replace(/\W/g, '');
                 let checked=selectedSubTopics.has(sub)? 'checked':'';
                 html += `<div class="form-check">
@@ -101,19 +102,19 @@ function renderSubTopics(){
     document.getElementById('subtopics-container').innerHTML=html;
 
     let validSubs=new Set();
-    selectedTopics.forEach(topic => {
-        if(SUB_TOPICS[topic]) SUB_TOPICS[topic].forEach(s => validSubs.add(s));
+    selectedTopics.forEach(topic=>{
+        if(SUB_TOPICS[topic]) SUB_TOPICS[topic].forEach(s=>validSubs.add(s));
     });
-    selectedSubTopics.forEach(s => {
+    selectedSubTopics.forEach(s=>{
         if(!validSubs.has(s)) selectedSubTopics.delete(s);
     });
 
-    document.querySelectorAll('.subtopic-cb').forEach(cb => {
+    document.querySelectorAll('.subtopic-cb').forEach(cb=>{
         cb.addEventListener('change', (e)=>{
-            if(e.target.checked) {
+            if(e.target.checked){
                 selectedSubTopics.add(e.target.value);
                 if(!subTopicAmounts[e.target.value]) subTopicAmounts[e.target.value]=10;
-            } else {
+            } else{
                 selectedSubTopics.delete(e.target.value);
             }
             renderSliders();
@@ -124,9 +125,9 @@ function renderSubTopics(){
 
 function renderSliders(){
     let html='';
-    if (selectedSubTopics.size===0) {
+    if (selectedSubTopics.size===0){
         html='<p class="empty-message">Select subtopics in the Filters tab to see options here.</p>';
-    } else {
+    } else{
         selectedSubTopics.forEach(sub=>{
             let val=subTopicAmounts[sub] || 10;
             let cleanId=sub.replace(/\W/g, '');
@@ -140,8 +141,8 @@ function renderSliders(){
     }
     document.getElementById('sliders-container').innerHTML=html;
 
-    document.querySelectorAll('.q-slider').forEach(slider => {
-        slider.addEventListener('input', (e) => {
+    document.querySelectorAll('.q-slider').forEach(slider=>{
+        slider.addEventListener('input', (e)=>{
             let sub=e.target.getAttribute('data-sub');
             let val=parseInt(e.target.value);
             subTopicAmounts[sub]=val;
@@ -152,7 +153,7 @@ function renderSliders(){
     updateTime();
 }
 
-document.getElementById('extra-time-slider').addEventListener('input', (e) => {
+document.getElementById('extra-time-slider').addEventListener('input', (e)=>{
     extraTime=parseInt(e.target.value);
     document.getElementById('extra-time-val').innerText=extraTime > 0 ? `+${extraTime} minutes` : 'No extra time';
     updateTime();
@@ -170,10 +171,11 @@ function updateTime(){
     document.getElementById('timeDisplay').innerText=`Time: ${mins} minutes and ${secs} seconds.`;
 }
 
-async function beginSession() {
+async function beginCustomSession(){
     let payload={
+        mode: 'custom',
         questionCount: Object.fromEntries(
-            Array.from(selectedSubTopics).map(sub => [sub, subTopicAmounts[sub] || 10])
+            Array.from(selectedSubTopics).map(sub=>[sub, subTopicAmounts[sub]||10])
         ),
         difficulties: Array.from(selectedDifficulties),
         extraTime: extraTime
@@ -184,4 +186,121 @@ async function beginSession() {
     window.location.href='../qv_window.html';
 }
 
+// full test
 
+let fullTestSubjects=new Set(['Math', 'English']);
+let fullTestExtraTime=0;
+
+
+function initializeFullTest(){
+    const mathCB=document.getElementById('full-test-math');
+    const englishCB=document.getElementById('full-test-english');
+
+    const skipMathCB=document.getElementById('skip-module-math');
+    const skipEnglishCB=document.getElementById('skip-module-english');
+
+    mathCB.addEventListener('change', ()=>{
+        if (mathCB.checked){
+            fullTestSubjects.add('Math');
+        } else{
+            fullTestSubjects.delete('Math');
+
+            skipMathCB.checked=false;
+        }
+
+        updateFullTestSkipControls();
+    });
+
+    englishCB.addEventListener('change', ()=>{
+        if (englishCB.checked){
+            fullTestSubjects.add('English');
+        } else{
+            fullTestSubjects.delete('English');
+
+            skipEnglishCB.checked=false;
+        }
+
+        updateFullTestSkipControls();
+    });
+
+    document
+        .getElementById('full-test-extra-time-slider')
+        .addEventListener('input', (e)=>{
+
+            fullTestExtraTime=parseInt(e.target.value);
+
+            document.getElementById('full-test-extra-time-val').innerText=
+                fullTestExtraTime > 0
+                    ? `+${fullTestExtraTime} minutes`
+                    : 'No extra time';
+
+            document.getElementById('full-test-timeDisplay').innerText=
+                `Extra Time: ${fullTestExtraTime} minutes`;
+        });
+
+    updateFullTestSkipControls();
+}
+
+
+function updateFullTestSkipControls(){
+    const mathSelected=document.getElementById('full-test-math').checked;
+    const englishSelected=document.getElementById('full-test-english').checked;
+
+    const skipMathCB=document.getElementById('skip-module-math');
+    const skipEnglishCB=document.getElementById('skip-module-english');
+
+    skipMathCB.disabled=!mathSelected;
+    skipEnglishCB.disabled=!englishSelected;
+
+    if (!mathSelected){
+        skipMathCB.checked=false;
+    }
+
+    if (!englishSelected){
+        skipEnglishCB.checked=false;
+    }
+}
+
+
+async function beginFullTestSession(){
+    const mathSelected=
+        document.getElementById('full-test-math').checked;
+
+    const englishSelected=
+        document.getElementById('full-test-english').checked;
+
+    const skipMath=
+        document.getElementById('skip-module-math').checked;
+
+    const skipEnglish=
+        document.getElementById('skip-module-english').checked;
+
+
+    if (!mathSelected && !englishSelected){
+        alert('Please select at least one module.');
+        return;
+    }
+
+
+    const payload={
+        mode: 'full_test',
+
+        subjects:{
+            Math: mathSelected,
+            English: englishSelected
+        },
+
+        skipModuleOne:{
+            Math: mathSelected && skipMath,
+            English: englishSelected && skipEnglish
+        },
+
+        extraTime: fullTestExtraTime
+    };
+
+
+    const targetUrl=
+        await pywebview.api.submitSettings(payload);
+
+    window.location.href='../qv_window.html';
+}

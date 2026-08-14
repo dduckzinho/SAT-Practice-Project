@@ -1,4 +1,3 @@
-
 let questionStartTime=0;
 let currentQuestionId=null; 
 let timeSpent={};
@@ -53,20 +52,21 @@ async function loadAndRenderCurrentQuestion(){
     optionsContainer.innerHTML='';
 
     const qType=(question.type||"").toLowerCase();
+    const savedAnswer=question.userAnswer || "";
 
-    await pywebview.api.debug(question.options);
-    await pywebview.api.debug(question.resource);
+    await pywebview.api.debug("-------------------------------------");
+    await pywebview.api.debug(question.answer);
     await pywebview.api.debug("-------------------------------------");
 
-    if (qType === "mcq") {
-        if (question.options) {
-            if (Array.isArray(question.options)) {
-                const letters = ['A', 'B', 'C', 'D', 'E', 'F']; // Covers up to 6 options
-                
-                question.options.forEach((opt, index) => {
-                    const assignedLetter = letters[index] || String.fromCharCode(65 + index);
+    if (qType==="mcq") {
+        if (question.options){
+            if (Array.isArray(question.options)){
+                const letters=['A', 'B', 'C', 'D'];
+                question.options.forEach((opt, index)=>{
+                    const assignedLetter=letters[index]||String.fromCharCode(65+index);
+                    const isChecked=(savedAnswer===assignedLetter) ? "checked" : "";
                     
-                    optionsContainer.innerHTML += `
+                    optionsContainer.innerHTML+=`
                         <div class="form-check mb-2 p-2 rounded">
                             <input
                                 class="form-check-input"
@@ -74,7 +74,8 @@ async function loadAndRenderCurrentQuestion(){
                                 name="answerOption"
                                 id="opt${index}"
                                 value="${assignedLetter}"
-                                onchange="saveAnswer('${assignedLetter}')">
+                                onchange="saveAnswer('${assignedLetter}')"
+                                ${isChecked}> 
 
                             <label class="form-check-label w-100" for="opt${index}">
                                 <strong>${assignedLetter}.</strong> ${opt.content || opt.body || "Option text missing"}
@@ -83,8 +84,10 @@ async function loadAndRenderCurrentQuestion(){
                     `;
                 });
             } else {
-                Object.entries(question.options).forEach(([letter, opt], index) => {
-                    optionsContainer.innerHTML += `
+                Object.entries(question.options).forEach(([letter, opt], index)=>{
+                    const isChecked=(savedAnswer===letter) ? "checked" : "";
+
+                    optionsContainer.innerHTML+=`
                         <div class="form-check mb-2 p-2 rounded">
                             <input
                                 class="form-check-input"
@@ -92,7 +95,8 @@ async function loadAndRenderCurrentQuestion(){
                                 name="answerOption"
                                 id="opt${index}"
                                 value="${letter}"
-                                onchange="saveAnswer('${letter}')">
+                                onchange="saveAnswer('${letter}')"
+                                ${isChecked}>
 
                             <label class="form-check-label w-100" for="opt${index}">
                                 <strong>${letter}.</strong> ${opt.content || opt.body || "Option text missing"}
@@ -102,29 +106,39 @@ async function loadAndRenderCurrentQuestion(){
                 });
             }
         } else {
-            optionsContainer.innerHTML = `<p class="text-danger">Error: 'options' array is missing from Python response.</p>`;
+            optionsContainer.innerHTML=`<p class="text-danger">Error: 'options' array is missing from Python response.</p>`;
         }
         
     } else if (qType==="spr"||qType==="grid_in"){
         optionsContainer.innerHTML=`
             <div class="mb-3">
                 <label for="spr-input" class="form-label text-light">Enter your response:</label>
-                <input type="text" id="spr-input" class="form-control bg-dark text-white" placeholder="Type answer here..." oninput="saveAnswer(this.value)">
+                <input type="text" id="spr-input" class="form-control bg-dark text-white" 
+                       placeholder="Type answer here..." 
+                       value="${savedAnswer}" 
+                       oninput="saveAnswer(this.value)">
             </div>
         `;
-    } else{
+    } else {
         optionsContainer.innerHTML=`<p class="text-warning">Warning: Unrecognized question type received: '${question.type}'</p>`;
     }
 
     const nextBtn=document.getElementById('next-btn');
+    const nextModuleBtn=document.getElementById('next-module-btn');
     const submitBtn=document.getElementById('submit-btn');
     const prevBtn=document.getElementById('prev-btn');
 
     if (question.isLast){
         nextBtn.classList.add('d-none');
+        nextModuleBtn.classList.add('d-none');
         submitBtn.classList.remove('d-none');
-    } else{
+    } else if (question.isLastInModule) {
+        nextBtn.classList.add('d-none');
+        nextModuleBtn.classList.remove('d-none');
+        submitBtn.classList.add('d-none');
+    } else {
         nextBtn.classList.remove('d-none');
+        nextModuleBtn.classList.add('d-none');
         submitBtn.classList.add('d-none');
     }
 
@@ -135,7 +149,7 @@ async function loadAndRenderCurrentQuestion(){
     }
 }
 
-function recordAndSyncTime(){
+async function recordAndSyncTime(){
     if (currentQuestionId && questionStartTime>0){
         const elapsed=Date.now()-questionStartTime;
         await pywebview.api.updateQuestionTime(elapsed);
@@ -144,13 +158,19 @@ function recordAndSyncTime(){
 }
 
 async function handleNextQuestion(){
-    recordAndSyncTime();
+    await recordAndSyncTime();
     await pywebview.api.nextQuestion();
     await loadAndRenderCurrentQuestion();
 }
 
+async function handleNextModule(){
+    await recordAndSyncTime();
+    await pywebview.api.nextModule();
+    await loadAndRenderCurrentQuestion();
+}
+
 async function handlePreviousQuestion(){
-    recordAndSyncTime();
+    await recordAndSyncTime();
     await pywebview.api.previousQuestion();
     await loadAndRenderCurrentQuestion();
 }
@@ -158,7 +178,6 @@ async function handlePreviousQuestion(){
 async function saveAnswer(userAnswer){
     await pywebview.api.submitAnswer(userAnswer);
 }
-
 
 async function submitFinalTest(){
     const submitBtn=document.getElementById('submit-btn');
@@ -172,7 +191,7 @@ async function submitFinalTest(){
     try{
         const result=await pywebview.api.finalizeSession();
         
-        if (result && result.status==="success"){
+        if (result){
             showResultsDashboard(result.score);
         } else{
             await pywebview.api.debug("No result or result was unsucessful.");

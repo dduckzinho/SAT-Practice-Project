@@ -66,9 +66,13 @@ def getImportantData(question):
     subTopic=question["skill_desc"]
     difficulty=question["difficulty"]
 
-    return ({"questionId":questionId,
-             "externalId":externalId,
-             "topic":topic,
-             "subtopic":subTopic,
-             "difficulty":difficulty})
+    
+    if subTopic=="Cross-text Connections":
+        subTopic="Cross-Text Connections"
+
+    return ({"questionId":questionId.strip(),
+             "externalId":externalId.strip(),
+             "topic":topic.strip(),
+             "subtopic":subTopic.strip(),
+             "difficulty":difficulty.strip()})
 
